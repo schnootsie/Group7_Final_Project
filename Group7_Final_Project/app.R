@@ -19,16 +19,16 @@ abandoned <- st_read("Abandoned_Property_Parcels/Abandoned_Property_Parcels.shp"
 
 # set up
 census_area <- c("All","1","2","3.01","3.02","4","5","6","7","8","9",
-                                            "10","11","12","13","14","15","16","17","19",
-                                            "20","21","22","23","24","25","26","27","28","29",
-                                            "30","31","32","33","34","35",
-                                            "101","102","103","104","105","106","107","108","109",
-                                            "110","111","112.01","112.02",
-                                            "113.01","113.02","113.03","113.04","113.05","113.06",
-                                            "114.03","114.05","114.06",
-                                            "115.01","115.03","115.04","115.05","115.06",
-                                            "116.01","116.02","117.01","117.02","118.01","118.02",
-                                            "119","120","121","122","123","124")
+                 "10","11","12","13","14","15","16","17","19",
+                 "20","21","22","23","24","25","26","27","28","29",
+                 "30","31","32","33","34","35",
+                 "101","102","103","104","105","106","107","108","109",
+                 "110","111","112.01","112.02",
+                 "113.01","113.02","113.03","113.04","113.05","113.06",
+                 "114.03","114.05","114.06",
+                 "115.01","115.03","115.04","115.05","115.06",
+                 "116.01","116.02","117.01","117.02","118.01","118.02",
+                 "119","120","121","122","123","124")
 
 police.points <- read.csv("PoliceForce/Police_Use_of_Force_Incidents.csv")
 
@@ -90,104 +90,96 @@ race_axis <- c("White", "Black", "American Indian", "Asian", "Native Hawaiian", 
 # Define UI for application that draws a histogram
 ui <- fluidPage(theme = "litera.css",
                 
-
-    # Application title
-    titlePanel("Rebuilding our neighborhoods block by block"),
-
-    # Sidebar with a slider input for number of bins 
-    sidebarLayout(
-        sidebarPanel(
-            selectInput(inputId = "area",
-                        
-                        label = "Choose Area",
-                        choices = census_area,
+                
+                # Application title
+                titlePanel("Rebuilding our neighborhoods block by block"),
+                
+                # Sidebar with a slider input for number of bins 
+                sidebarLayout(
+                    sidebarPanel(
+                        selectInput(inputId = "area",
+                                    
+                                    label = "Choose Area",
+                                    choices = census_area,
                                     selected = "All"),
-            width=2,
-            fluid=FALSE
-        ),
-
-        # Show a plot of the generated distribution
-        mainPanel(
-            tabsetPanel(type = "tabs",
-                        tabPanel(title = "About",
-                                 titlePanel("Welcome!"),
-                                 includeMarkdown("about.md"),
-                            fluidRow(
-                                     column(width = 3, 
-                                            #titlePanel(icon(phone-alt, "fa-2x"))
-                                            #titlePanel(icon("shield","fa-2x"))
-                                            titlePanel(icon("phone","fa-2x"))
-                                     ),
-                                     column(width = 3, offset = 1,
-                                            titlePanel(icon("users", "fa-2x"))
-                                     ),
-                                     column(width = 3, offset = 1,
-                                            #titlePanel(icon("home", "fa-2x"))
-                                            #titlePanel(icon("store", "fa-2x"))
-                                            titlePanel(icon("city", "fa-2x"))
-                                     )),
-                            fluidRow(
-                                     column(width = 3,  
-                                            style = "background-color: #edf8b1;",
-                                            includeMarkdown("call_stat.md")
-                                     ),
-                                     column(width = 3, offset = 1, 
-                                            style = "background-color: #7fcdbb;",
-                                            includeMarkdown("demo_stat.md")
-                                     ),
-                                     column(width = 3, offset = 1, 
-                                            style = "background-color: #2c7fb8;",
-                                            includeMarkdown("abandon_stat.md")
-                                     ))
-                        ),
+                        width=2,
+                        fluid=FALSE
+                    ),
+                    
+                    # Show a plot of the generated distribution
+                    mainPanel(
+                        tabsetPanel(type = "tabs",
+                                    tabPanel(title = "About",
+                                             titlePanel("Welcome!"),
+                                             includeMarkdown("about.md"),
+                                             fixedRow(
+                                                 column(width = 3,
+                                                        align = "center",
+                                                        style = "background-color: #c8e6c9;",
+                                                        titlePanel(icon("phone","fa-2x")),
+                                                        htmlOutput("phone")
+                                                 ),
+                                                 column(width = 3, offset = 1,
+                                                        align = "center",
+                                                        style = "background-color: #fff9c4;",
+                                                        titlePanel(icon("city","fa-2x")),
+                                                        htmlOutput("abandon")
+                                                 ),
+                                                 column(width = 3, offset = 1,
+                                                        align = "center",
+                                                        style = "background-color: #bbdefb;",
+                                                        titlePanel(icon("users","fa-2x")),
+                                                        htmlOutput("cen")
+                                                 ))
+                                    ),
+                                    tabPanel(title = "Police Response Activity",
+                                             leafletOutput(outputId = "areaPlot"),
+                                             fluidRow(
+                                                 column(12,
+                                                        align = "center",
+                                                        htmlOutput("text")
+                                                 )),
+                                             fixedRow(
+                                                 column(5,
+                                                        plotOutput(outputId ="plot1")
+                                                 ),
+                                                 column(7,
+                                                        plotOutput(outputId ="plot2"),
+                                                        theme = "litera.css"
+                                                 ))
+                                    ),
+                                    tabPanel(title = "Abandon Properties",
+                                             leafletOutput(outputId = "mymap"),
+                                             fluidRow(
+                                                 splitLayout(cellWidths = c("50%", "50%"), plotOutput("plot1a"), plotOutput("plot3"))
+                                             )
+                                    ),
+                                    tabPanel(title = "Demographics",
+                                             #titlePanel("Demographics"),)
+                                             fluidRow(
+                                                 leafletOutput(outputId = "mapPlot"),
+                                                 column(2,
+                                                        radioButtons(inputId = 'demo',
+                                                                     label = 'Choose Demographic',
+                                                                     choices = c("Age", "Race"))
+                                                 ),
+                                                 column(10, 
+                                                        plotOutput(outputId = "demoPlot")
+                                                 ))
+                                    )
+                        )
                         
-                        tabPanel(title = "Police Response Activity",
-                                 leafletOutput(outputId = "areaPlot"),
-                            fluidRow(
-                                column(12,
-                                       align = "center",
-                                       htmlOutput("text")
-                                )),
-                            fixedRow(
-                                column(5,
-                                       plotOutput(outputId ="plot1")
-                                ),
-                                column(7,
-                                        plotOutput(outputId ="plot2"),
-                                       theme = "litera.css"
-                                ))
-                        ),
-                        tabPanel(title = "Abandon Properties",
-                                 leafletOutput(outputId = "mymap"),
-                            fluidRow(
-                                splitLayout(cellWidths = c("50%", "50%"), plotOutput("plot1a"), plotOutput("plot3"))
-                            )
-                        ),
-                        tabPanel(title = "Demographics",
-                                 #titlePanel("Demographics"),)
-                             fluidRow(
-                                 column(2,
-                                        radioButtons(inputId = 'demo',
-                                                     label = 'Choose Demographic',
-                                                     choices = c("Age", "Race"))
-                                 ),
-                                 column(10, 
-                                        plotOutput(outputId = "demoPlot")
-                                 )),
-                             leafletOutput(outputId = "mapPlot"))
-            )
-            
-            
-        )
-            
-    )
+                        
+                    )
+                    
+                )
 )
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
     
     # POLICE FORCE
-
+    
     dat <-reactive({
         if(input$area == "All"){
             rtrn <- census_calls
@@ -207,9 +199,10 @@ server <- function(input, output) {
                 group_by(Type_of_Resistance) %>%
                 tally  %>% 
                 na.omit()%>%
-                top_n(10,n)%>%
-                arrange(desc(n))
-               
+                arrange(desc(n))%>%
+                top_n(10,n)
+            
+            
             
         }else{
             
@@ -250,7 +243,7 @@ server <- function(input, output) {
     })
     
     output$areaPlot <- renderLeaflet({
-
+        
         mytext <- paste(
             "Area: ", dat()$NAME, "<br/>", 
             "<strong>Calls: ", dat()$calls,"</strong>",
@@ -274,41 +267,41 @@ server <- function(input, output) {
     output$plot1 <- renderPlot({
         
         theme_set(theme_classic())
-
-            ggplot(gbdat(), aes(x=reorder(Type_of_Resistance,-n), y=n, fill=Type_of_Resistance)) + 
+        
+        ggplot(gbdat(), aes(x=reorder(Type_of_Resistance,-n), y=n, fill=Type_of_Resistance)) + 
             geom_bar(aposition="dodge", stat="identity", width = 0.5)  +
             #scale_fill_viridis(discrete = T, option = "E") +
             
             theme(axis.text.x = element_text(angle = 60,hjust=1),legend.position = "none") + 
-                labs(title="Resistance to Police Response", 
-                     subtitle="Type of Resistance")+
+            labs(title="Resistance to Police Response", 
+                 subtitle="Type of Resistance")+
             ylab("")+
             xlab("")+
             scale_fill_brewer(palette="Set3")+
-                theme(plot.title=element_text(size=15, 
-                                              face="bold", 
-                                              family="Helvetica",
-                                             
-                                              hjust=0.5,
-                                              lineheight=1.2),  # title
-                      plot.subtitle=element_text(size=12, 
-                                                 family="Helvetica",
-                                                 face="italic",
-                                                 hjust=0.5),  # subtitle
-                      plot.caption=element_text(size=10,
-                                                
-                                                family="Helvetica"),
-                      axis.text.x=element_text(size=10,
-                                               face="bold"))
+            theme(plot.title=element_text(size=15, 
+                                          face="bold", 
+                                          family="Helvetica",
+                                          
+                                          hjust=0.5,
+                                          lineheight=1.2),  # title
+                  plot.subtitle=element_text(size=12, 
+                                             family="Helvetica",
+                                             face="italic",
+                                             hjust=0.5),  # subtitle
+                  plot.caption=element_text(size=10,
+                                            
+                                            family="Helvetica"),
+                  axis.text.x=element_text(size=10,
+                                           face="bold"))
         
-
+        
     })
     
     output$plot2 <- renderPlot({
         
-       
         
-            ggplot(gpdat(), aes(x=reorder(Call_in_Response_To,-n), y=n, fill=Call_in_Response_To)) + 
+        
+        ggplot(gpdat(), aes(x=reorder(Call_in_Response_To,-n), y=n, fill=Call_in_Response_To)) + 
             geom_bar(position="dodge", stat="identity")  +
             #scale_fill_viridis(discrete = T, option = "E") +
             
@@ -340,12 +333,73 @@ server <- function(input, output) {
     output$text <- renderText({
         paste0("<br><div class='jumbotron' style='
                 padding: 10px'>
-                <p>",icon("shield","fa-3x"),"</p>
                 <h4><strong>Police Force Characteristics for Area:</strong>
                 <p>", input$area, "</p></h4>")
     })
+    output$phone <- renderText({
+        # paste0("<div class='card text-wite bg-primary mb-3'>
+        #         <div class='card-header'>Calls to Police</div>
+        #         <div class'card-body'>
+        #         <h4 class='card-title'>Total Calls</h4>
+        #         <p class='card-text'>203 </p>
+        #         </div>
+        #         </div>")
+        paste0('
+        <div class="card text-white green lighten-4" style="padding: 5px">
+        <div class="card-body">
+        <h4 class="card-title"><strong><center><u>Calls to Police</u></center></strong></h4>
+        <h5 class="card-text" ><strong><center>Total Calls</center></strong></h5>
+        <p class="card-text" ><center>203</center></p> 
+        <h5 class="card-text" ><strong><center>Most Calls for</center></strong></h5>
+        <p class="card-text" ><center>Domestic: 26</center></p>
+        <h5 class="card-text" ><strong><center>Freq. Resist Type</center></strong></h5>
+        <p class="card-text" ><center>Physical: 187</center></p>
+              </div> </div>')
+    })
+    
+    output$cen <- renderText({
+        
+        paste0('
+        <div class="card text-white blue lighten-4" style="padding: 5px">
+        <div class="card-body">
+        <h4 class="card-title"><strong><center><u>Census</u></center></strong></h4>
+        <h5 class="card-text" ><strong><center>Population</center></strong></h6>
+        <p class="card-text" ><center>266,931</center></p> 
+        <h5 class="card-text" ><strong><center>Area</center></strong></h6>
+        <p class="card-text" ><center>461.39 sq. miles</center></p>
+        <h5 class="card-text" ><strong><center>Census Tracts</center></strong></h6>
+        <p class="card-text" ><center>75</center></p>
+              </div> </div>')
+    })
+    
+    output$abandon <- renderText({
+        
+        paste0('
+        <div class="card text-white yellow lighten-4" style="padding: 5px">
+        <div class="card-body">
+        <h4 class="card-title"><strong><center><u>Abandon</u></center></strong></h4>
+        <h5 class="card-text" ><strong><center>Properties</center></strong></h5>
+        <p class="card-text" ><center>1,511</center></p> 
+        <h5 class="card-text" ><strong><center>Zip Codes</center></strong></h5>
+        <p class="card-text" ><center>13</center></p>
+        <h5 class="card-text" ><strong><center>Time Frame</center></strong></h5>
+        <p class="card-text" ><center>2013-2016</center></p>
+              </div> </div>')
+    })
+    
     
     # ABANDON
+    # **Total Population:**
+    #     
+    #     266,931
+    # 
+    # **Total Area:**
+    #     
+    #     461.3855 sq. miles
+    # 
+    # **Number of Census Tracts:**
+    #     
+    #     75
     
     mapDat <-reactive({
         if(input$area == "All"){
@@ -567,13 +621,10 @@ server <- function(input, output) {
         leaflet(mapDat())  %>%
             setView(.,lng = -86.2520, lat = 41.6764, zoom = 11) %>%
             addTiles(group = "Basic")  %>%
-            # addPolygons(data = census, popup = ~popup, color = "grey", fill = "light grey") %>%
-            # addPolygons(data = mapDat(), popup = ~popup, color = "blue", fill = "light blue") %>%
             addPolygons(data = mapDat(),
                         label = popup,
                         color = "#225EA8", 
                         weight = 3) 
-        #setView(.,lng = -86.2520, lat = 41.6764, zoom = 11)
     })
     output$demoPlot <- renderPlot({
         # generate bar chart of ages based on area
@@ -597,7 +648,7 @@ server <- function(input, output) {
             scale_fill_brewer(palette="Set3")
     })
     
-
+    
 }
 
 # Run the application 
